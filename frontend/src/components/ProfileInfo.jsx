@@ -22,7 +22,7 @@ const ProfileInfo = ({ onLogout, userInfo }) => {
       {isOpen && userInfo && (
         <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg">
           <div className="p-4">
-            <p className="text-gray-900 font-semibold">{userInfo.username}</p>
+            <p className="text-gray-900 font-semibold">{userInfo.user.username}</p>
           </div>
           <button
             onClick={onLogout}
