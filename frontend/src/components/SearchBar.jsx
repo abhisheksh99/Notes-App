@@ -1,9 +1,8 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
-import { IoMdCloseCircleOutline } from 'react-icons/io'; 
+import { IoMdCloseCircleOutline } from 'react-icons/io';
 
 const SearchBar = ({ value, onChange, handleSearch, clearSearch }) => {
-   
   return (
     <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-2 shadow-sm w-full max-w-md mx-auto">
       <FiSearch className="text-gray-500 mr-2 cursor-pointer" onClick={handleSearch} />

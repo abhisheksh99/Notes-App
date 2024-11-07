@@ -9,7 +9,7 @@ import axios from 'axios';
 
 Modal.setAppElement('#root');
 
-const Home = () => {
+const Home = ({ searchResults }) => {
   const { currentUser } = useSelector(state => state.user);
   const [openAddEditModal, setOpenAddEditModal] = useState({ isShown: false, type: "add", data: null });
   const [allNotes, setAllNotes] = useState([]);
@@ -23,6 +23,14 @@ const Home = () => {
     }
   }, [currentUser, navigate]);
 
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      setAllNotes(searchResults);
+    } else {
+      getAllNotes();
+    }
+  }, [searchResults]);
+
   // Function to fetch all notes
   const getAllNotes = async () => {
     try {
@@ -35,7 +43,6 @@ const Home = () => {
     }
   };
 
-  // Function to add or edit a note
   const handleAddEditNote = async (note) => {
     try {
       let res;
@@ -46,33 +53,31 @@ const Home = () => {
       }
 
       if (res.data.success) {
-        getAllNotes(); // Refresh notes list after adding/editing
-        setOpenAddEditModal({ isShown: false, type: "add", data: null }); // Close modal
+        getAllNotes();
+        setOpenAddEditModal({ isShown: false, type: "add", data: null });
       }
     } catch (error) {
       console.error("Error saving note:", error.message);
     }
   };
 
-  // Function to delete a note
   const handleDeleteNote = async (noteId) => {
     try {
       const res = await axios.delete(`http://localhost:3000/api/note/delete/${noteId}`, { withCredentials: true });
       if (res.data.success) {
-        setAllNotes(allNotes.filter(note => note._id !== noteId)); // Remove note from state
+        setAllNotes(allNotes.filter(note => note._id !== noteId));
       }
     } catch (error) {
       console.error("Error deleting note:", error.message);
     }
   };
 
-  // Function to toggle the pinned state of a note
   const handlePinNote = async (note) => {
     try {
       const updatedNote = { ...note, isPinned: !note.isPinned };
       const res = await axios.put(`http://localhost:3000/api/note/update-note-pinned/${note._id}`, updatedNote, { withCredentials: true });
       if (res.data.success) {
-        getAllNotes(); // Refresh notes to reflect the pin change
+        getAllNotes();
       }
     } catch (error) {
       console.error("Error pinning note:", error.message);

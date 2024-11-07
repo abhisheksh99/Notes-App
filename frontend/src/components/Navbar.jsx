@@ -6,17 +6,11 @@ import SearchBar from "./SearchBar";
 import ProfileInfo from "./ProfileInfo";
 import { signOutStart, signOutSuccess, signOutFailure } from "../store/userSlice/userSlice";
 
-const Navbar = () => {
+const Navbar = ({ handleSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  // Get the current user info from Redux state
   const userInfo = useSelector((state) => state.user.currentUser);
-  console.log("Current User Info in Navbar:", userInfo);  // Log userInfo for verification
-
-  const handleSearch = () => {};
-  const clearSearch = () => setSearchQuery("");
 
   const onLogout = async () => {
     try {
@@ -25,17 +19,25 @@ const Navbar = () => {
         withCredentials: true,
       });
       
-      if (res.data.success === false) {
+      if (!res.data.success) {
         dispatch(signOutFailure(res.data.message));
         return;
       }
-
       dispatch(signOutSuccess());
       navigate("/login");
-      
     } catch (error) {
       dispatch(signOutFailure(error.message));
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    handleSearch(e.target.value); // Pass search query to App
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    handleSearch(""); // Clear search results
   };
 
   return (
@@ -49,8 +51,8 @@ const Navbar = () => {
 
       <SearchBar
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        handleSearch={handleSearch}
+        onChange={handleSearchChange}
+        handleSearch={() => handleSearch(searchQuery)}
         clearSearch={clearSearch}
       />
 
