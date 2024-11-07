@@ -1,30 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd } from 'react-icons/md'; 
 import NoteCard from '../components/NoteCard';
 import Modal from 'react-modal';
 import AddEditNotes from './AddEditNotes';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-Modal.setAppElement('#root'); // Set app element for accessibility
+Modal.setAppElement('#root'); 
 
 const Home = () => {
+  const { currentUser, loading, errorDispatch } = useSelector(state => state.user);
   const [openAddEditModal, setOpenAddEditModal] = useState({ isShown: false, type: "add", data: null });
-  
+  const navigate = useNavigate();
+
   const randomNote = {
     title: 'Random Note',
     date: new Date(),
     content: 'This is a randomly generated content for the NoteCard. It provides a sample of text for demonstration purposes...',
     tags: ['random', 'sample', 'note'],
-    isPinned: Math.random() > 0.5, 
+    isPinned: Math.random() > 0.5,
   };
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/login");
+    }
+  }, [currentUser, navigate]);
 
   const handlePinNote = () => console.log('Pin note clicked');
   const handleEditNote = () => console.log('Edit note clicked');
   const handleDeleteNote = () => console.log('Delete note clicked');
-
-  const handleAddNote = (note) => {
-    console.log('Adding or updating note:', note);
-    // Perform any save or update operations here
-  };
+  const handleAddNote = (note) => console.log('Adding or updating note:', note);
 
   return (
     <>
@@ -43,7 +49,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Add button */}
       <button 
         className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-600 text-white fixed bottom-20 right-8 shadow-lg hover:bg-blue-700 transition-all duration-200 ease-in-out transform hover:scale-105 z-10"
         aria-label="Add new note"
@@ -52,14 +57,11 @@ const Home = () => {
         <MdAdd size={24} />
       </button>
 
-      {/* Modal */}
       <Modal
         isOpen={openAddEditModal.isShown}
         onRequestClose={() => setOpenAddEditModal({ isShown: false, type: "add", data: null })}
         style={{
-          overlay: {
-            backgroundColor: "rgba(0,0,0,0.2)",
-          },
+          overlay: { backgroundColor: "rgba(0,0,0,0.2)" },
         }}
         contentLabel="Add/Edit Note"
         className="w-[40%] max-md:w-[60%] max-sm:w-[70%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-scroll"

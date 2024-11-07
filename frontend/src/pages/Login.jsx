@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdEmail } from "react-icons/md";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { validateEmail } from "../utils/helper";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import { signInFailure, signInStart, signInSuccess } from "../store/userSlice/userSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,8 +13,12 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isShowPassword, setIsShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+
     if (!validateEmail(email)) {
       setError("Please enter a valid email address");
       return;
@@ -22,7 +29,27 @@ const Login = () => {
       return;
     }
     setError("");
-    // TODO: Implement login API call
+
+    try {
+      dispatch(signInStart());
+      const res = await axios.post("http://localhost:3000/api/user/signin", {
+        email,
+        password
+      }, {
+        withCredentials: true
+      });
+
+      if (res.data.success === false) {
+        console.log(res.data);
+        dispatch(signInFailure(res.data.message));
+        return;
+      }
+      
+      dispatch(signInSuccess(res.data));
+      navigate("/");
+    } catch (error) {
+      dispatch(signInFailure(error.message));
+    }
   };
 
   const toggleShowPassword = () => {
