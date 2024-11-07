@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Home from './pages/Home';
 import SignUp from './pages/SignUp';
@@ -9,18 +9,19 @@ import Footer from './components/Footer';
 
 const App = () => {
   const { currentUser } = useSelector(state => state.user);
-  console.log("Current User in App:", currentUser);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!currentUser) {
+    // Redirect to login only if user is not logged in and accessing a protected route ("/")
+    if (!currentUser && location.pathname === "/") {
       navigate("/login");
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, location.pathname]);
 
   return (
     <>
-      <Navbar userInfo={currentUser?.user} />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />

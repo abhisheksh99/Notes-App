@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { MdEmail } from 'react-icons/md'; 
-import { FaUser, FaRegEye, FaRegEyeSlash } from 'react-icons/fa6'; 
-import { validateEmail } from '../utils/helper'; 
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { MdEmail } from "react-icons/md"; 
+import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa6"; 
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import { validateEmail } from "../utils/helper"; 
+import { signUpStart, signUpSuccess, signUpFailure } from "../store/userSlice/userSlice";
 
 const SignUp = () => {
   const [name, setName] = useState('');
@@ -10,9 +13,14 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isShowPassword, setIsShowPassword] = useState(false);
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+
+    // Frontend validation for the form fields
     if (!name) {
       setError("Please enter your name");
       return;
@@ -25,8 +33,31 @@ const SignUp = () => {
       setError("Please enter a password");
       return;
     }
-    setError("");
-    // TODO: Implement sign up API call
+
+    setError(""); 
+    dispatch(signUpStart());
+    
+    try {
+      const res = await axios.post("http://localhost:3000/api/user/signup", {
+        username: name,
+        email,
+        password,
+      },{
+        withCredentials: true
+      });
+
+      // Check for successful response and update Redux state
+      if (res.data.success) {
+        dispatch(signUpSuccess(res.data.user));
+        navigate("/"); 
+      } else {
+        dispatch(signUpFailure(res.data.message));
+        setError(res.data.message); 
+      }
+    } catch (error) {
+      dispatch(signUpFailure(error.message));
+      setError("Failed to sign up. Please try again.");
+    }
   };
 
   const toggleShowPassword = () => {
@@ -39,6 +70,7 @@ const SignUp = () => {
         <form onSubmit={handleSignUp}>
           <h4 className="text-2xl mb-7 font-semibold">Sign Up</h4>
 
+          {/* Name Input */}
           <div className="flex items-center bg-transparent border border-gray-300 rounded px-3 py-2 mb-4">
             <input
               type="text"
@@ -50,6 +82,7 @@ const SignUp = () => {
             <FaUser className="text-gray-400 ml-2" size={22} />
           </div>
 
+          {/* Email Input */}
           <div className="flex items-center bg-transparent border border-gray-300 rounded px-3 py-2 mb-4">
             <input
               type="email"
@@ -61,6 +94,7 @@ const SignUp = () => {
             <MdEmail className="text-gray-400 ml-2" size={22} />
           </div>
 
+          {/* Password Input with Toggle Visibility */}
           <div className="flex items-center bg-transparent border border-gray-300 rounded px-3 py-2 mb-4">
             <input
               type={isShowPassword ? 'text' : 'password'}
@@ -84,8 +118,10 @@ const SignUp = () => {
             )}
           </div>
 
+          {/* Display error messages */}
           {error && <p className="text-red-500 text-sm pb-1">{error}</p>}
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="btn-primary w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
@@ -93,6 +129,7 @@ const SignUp = () => {
             SIGN UP
           </button>
 
+          {/* Link to Login page */}
           <p className="text-sm text-center mt-4">
             Already have an account?{' '}
             <Link

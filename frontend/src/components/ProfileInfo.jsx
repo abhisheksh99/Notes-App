@@ -8,17 +8,19 @@ const ProfileInfo = ({ onLogout, userInfo }) => {
 
   return (
     <div className="relative inline-block text-left">
+      {/* Display initials if user exists, otherwise "NA" */}
       <div
-        onClick={toggleDropdown}
+        onClick={userInfo ? toggleDropdown : null} // Only toggle dropdown if userInfo exists
         className="flex items-center justify-center w-10 h-10 bg-slate-800 text-white font-bold rounded-full cursor-pointer"
       >
-        {getInitials(userInfo?.username)}
+        {userInfo ? getInitials(userInfo.username) : "NA"}
       </div>
 
-      {isOpen && (
+      {/* Show dropdown only if userInfo exists */}
+      {isOpen && userInfo && (
         <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg">
           <div className="p-4">
-            <p className="text-gray-900 font-semibold">{userInfo?.username}</p>
+            <p className="text-gray-900 font-semibold">{userInfo.username}</p>
           </div>
           <button
             onClick={onLogout}
