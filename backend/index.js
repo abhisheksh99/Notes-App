@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({extended: true})); // Parse URL-encoded bodies
-app.use(cors({origin: "*"})); // Enable CORS for all origins
+app.use(cors({origin: "http://localhost:5173",credentials: true})); // Enable CORS for all origins
 app.use(cookieParser()); // Parse cookies
 
 // Routes
