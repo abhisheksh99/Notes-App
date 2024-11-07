@@ -13,6 +13,7 @@ const Navbar = () => {
   
   // Get the current user info from Redux state
   const userInfo = useSelector((state) => state.user.currentUser);
+  console.log("Current User Info in Navbar:", userInfo);  // Log userInfo for verification
 
   const handleSearch = () => {};
   const clearSearch = () => setSearchQuery("");

@@ -4,6 +4,8 @@ import { getInitials } from "../utils/helper";
 const ProfileInfo = ({ onLogout, userInfo }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log("ProfileInfo userInfo:", userInfo); 
+
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
@@ -13,7 +15,7 @@ const ProfileInfo = ({ onLogout, userInfo }) => {
         onClick={userInfo ? toggleDropdown : null} // Only toggle dropdown if userInfo exists
         className="flex items-center justify-center w-10 h-10 bg-slate-800 text-white font-bold rounded-full cursor-pointer"
       >
-        {userInfo ? getInitials(userInfo.username) : "NA"}
+        {userInfo ? getInitials(userInfo.user.username) : "NA"}
       </div>
 
       {/* Show dropdown only if userInfo exists */}
