@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdClose } from 'react-icons/md';
 import TagInput from './TagInput';
 
-const AddEditNotes = ({ onClose, noteData, type, handleAddNote }) => {
+const AddEditNotes = ({ onClose, noteData, type, handleAddEditNote }) => {
   const [title, setTitle] = useState(noteData?.title || '');
   const [content, setContent] = useState(noteData?.content || '');
   const [tags, setTags] = useState(noteData?.tags || []);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (noteData) {
+      setTitle(noteData.title || '');
+      setContent(noteData.content || '');
+      setTags(noteData.tags || []);
+    }
+  }, [noteData]);
 
   const handleNoteAction = () => {
     if (!title || !content) {
       setError("Title and content are required");
       return;
     }
-    handleAddNote({ title, content, tags });
+    handleAddEditNote({ title, content, tags, _id: noteData?._id });
     onClose();
   };
 
@@ -30,7 +38,7 @@ const AddEditNotes = ({ onClose, noteData, type, handleAddNote }) => {
         <input
           type="text"
           className="text-2xl text-slate-950 outline-none"
-          placeholder="Wake up at 6 a.m."
+          placeholder="Note Title"
           value={title}
           onChange={({ target }) => setTitle(target.value)}
         />
@@ -39,7 +47,7 @@ const AddEditNotes = ({ onClose, noteData, type, handleAddNote }) => {
         <label className="input-label text-red-400 uppercase">Content</label>
         <textarea
           className="text-sm text-slate-950 outline-none bg-slate-50 p-2 rounded"
-          placeholder="Content..."
+          placeholder="Note content..."
           rows={10}
           value={content}
           onChange={({ target }) => setContent(target.value)}

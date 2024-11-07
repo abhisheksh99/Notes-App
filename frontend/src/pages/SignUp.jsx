@@ -1,26 +1,25 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MdEmail } from "react-icons/md"; 
-import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa6"; 
+import { MdEmail } from "react-icons/md";
+import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { validateEmail } from "../utils/helper"; 
+import { validateEmail } from "../utils/helper";
 import { signUpStart, signUpSuccess, signUpFailure } from "../store/userSlice/userSlice";
 
 const SignUp = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isShowPassword, setIsShowPassword] = useState(false);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    // Frontend validation for the form fields
     if (!name) {
       setError("Please enter your name");
       return;
@@ -36,23 +35,36 @@ const SignUp = () => {
 
     setError(""); 
     dispatch(signUpStart());
-    
-    try {
-      const res = await axios.post("http://localhost:3000/api/user/signup", {
-        username: name,
-        email,
-        password,
-      },{
-        withCredentials: true
-      });
 
-      // Check for successful response and update Redux state
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/user/signup",
+        { username: name, email, password },
+        { withCredentials: true }
+      );
+
+      console.log("Signup API Response:", res.data);
+
       if (res.data.success) {
-        dispatch(signUpSuccess(res.data.user));
-        navigate("/"); 
+        const { _id, username, email: userEmail } = res.data.user || {}; // Safely destructuring
+
+        // Constructing the userInfo object to match the expected format in ProfileInfo
+        const userInfo = {
+          user: {
+            _id: _id || null,
+            username: username || null,
+            email: userEmail || null,
+          },
+          message: res.data.message,
+          success: res.data.success,
+        };
+
+        console.log("Dispatching to Redux:", userInfo);
+        dispatch(signUpSuccess(userInfo));
+        navigate("/"); // Redirect to the home page after successful signup
       } else {
         dispatch(signUpFailure(res.data.message));
-        setError(res.data.message); 
+        setError(res.data.message); // Display error message from server
       }
     } catch (error) {
       dispatch(signUpFailure(error.message));
@@ -60,9 +72,7 @@ const SignUp = () => {
     }
   };
 
-  const toggleShowPassword = () => {
-    setIsShowPassword(!isShowPassword);
-  };
+  const toggleShowPassword = () => setIsShowPassword(!isShowPassword);
 
   return (
     <div className="flex items-center justify-center mt-28">
@@ -97,7 +107,7 @@ const SignUp = () => {
           {/* Password Input with Toggle Visibility */}
           <div className="flex items-center bg-transparent border border-gray-300 rounded px-3 py-2 mb-4">
             <input
-              type={isShowPassword ? 'text' : 'password'}
+              type={isShowPassword ? "text" : "password"}
               placeholder="Password"
               className="w-full text-sm bg-transparent outline-none"
               value={password}
@@ -131,7 +141,7 @@ const SignUp = () => {
 
           {/* Link to Login page */}
           <p className="text-sm text-center mt-4">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link
               to="/login"
               className="font-medium text-blue-500 underline hover:text-blue-600"
